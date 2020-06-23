@@ -5,7 +5,6 @@ import ReactNative, {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   Dimensions,
   TextInput,
   ViewPropTypes,
@@ -17,28 +16,29 @@ import { InjectedProps } from "./connectToState";
 
 const s = StyleSheet.create({
   container: {
-	width: "100%",
+  	width: "100%",
     alignItems: "center",
-	paddingLeft: 10,
-	paddingRight: 10,
+  	paddingLeft: 10,
+  	paddingRight: 10,
   },
   form: {
     marginTop: 20,
-	marginBottom: 20,
-	width: 290,
+  	marginBottom: 20,
+  	width: 290,
   },
-  inputContainer: {
-	width: "100%",
+    inputContainer: {
+  	width: "100%",
   },
   inputLabel: {
     fontWeight: "bold",
   },
   input: {
-    height: 40,
+    paddingTop: 4,
+    paddingBottom: 8,
   },
   inputH: {
-	flexDirection: "row",
-	justifyContent: "space-between",
+    flexDirection: "row",
+    justifyContent: "space-between",
   }
 });
 
@@ -87,7 +87,7 @@ export default class CreditCardInput extends Component {
     },
     placeholders: {
       name: "Full Name",
-      number: "1234 5678 1234 5678",
+      number: "• • • •  • • • •  • • • •  • • • •",
       expiry: "MM/YY",
       cvc: "CVC",
       postalCode: "34567",
@@ -112,15 +112,11 @@ export default class CreditCardInput extends Component {
   _focus = field => {
     if (!field) return;
 
-    const scrollResponder = this.refs.Form.getScrollResponder();
     const nodeHandle = ReactNative.findNodeHandle(this.refs[field]);
 
     NativeModules.UIManager.measureLayoutRelativeToParent(nodeHandle,
       e => { throw e; },
-      x => {
-        scrollResponder.scrollTo({ x: Math.max(x - PREVIOUS_FIELD_OFFSET, 0), animated: true });
-        this.refs[field].focus();
-      });
+      x => { this.refs[field].focus(); });
   }
 
   _inputProps = field => {
@@ -136,7 +132,6 @@ export default class CreditCardInput extends Component {
       labelStyle: [s.inputLabel, labelStyle],
       validColor, invalidColor, placeholderColor,
       ref: field, field,
-
       label: labels[field],
       placeholder: placeholders[field],
       value: values[field],
@@ -158,7 +153,8 @@ export default class CreditCardInput extends Component {
 
     return (
       <View style={s.container}>
-        <CreditCard focused={focused}
+        <CreditCard
+          focused={focused}
           brand={type}
           scale={cardScale}
           fontFamily={cardFontFamily}
@@ -169,7 +165,8 @@ export default class CreditCardInput extends Component {
           number={number}
           expiry={expiry}
           cvc={cvc} />
-        <ScrollView ref="Form"
+        <View
+          ref="Form"
           keyboardShouldPersistTaps="always"
           style={s.form}>
           <CCInput {...this._inputProps("number")}
@@ -191,7 +188,7 @@ export default class CreditCardInput extends Component {
             <CCInput {...this._inputProps("postalCode")}
               keyboardType="numeric"
               containerStyle={[s.inputContainer, inputContainerStyle]} /> }
-        </ScrollView>
+        </View>
       </View>
     );
   }
